@@ -1,0 +1,21 @@
+# Configuration files that may contain sensitive data
+*.config
+*.conf
+saved_configs/
+
+# Windows thumbnail cache
+Thumbs.db
+
+# Folder config file
+Desktop.ini
+
+# PowerShell temporary files
+*.ps1~
+*.swp
+*.bak
+
+# Log files
+*.log
+
+# VS Code
+.vscode/
