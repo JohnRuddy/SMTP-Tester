@@ -247,6 +247,134 @@ function Test-SMTPConnection {
     }
 }
 
+# SMTP Service Templates
+$script:smtpTemplates = @{
+    "Gmail" = @{
+        Server = "smtp.gmail.com"
+        Port = 587
+        EnableSSL = $true
+        AuthMethod = "Basic (LOGIN)"
+        Subject = "Test Email from Gmail"
+        Body = "This is a test email sent via Gmail SMTP using PowerShell SMTP Tester.`n`nIf you receive this message, your Gmail SMTP configuration is working correctly!`n`nNote: You may need to use an App Password instead of your regular password.`n`nTimestamp: $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')"
+        IsHtml = $false
+        Notes = "Requires App Password. Enable 2FA and generate App Password at: myaccount.google.com/apppasswords"
+    }
+    "Outlook.com / Hotmail" = @{
+        Server = "smtp-mail.outlook.com"
+        Port = 587
+        EnableSSL = $true
+        AuthMethod = "Basic (LOGIN)"
+        Subject = "Test Email from Outlook.com"
+        Body = "This is a test email sent via Outlook.com SMTP using PowerShell SMTP Tester.`n`nIf you receive this message, your Outlook.com SMTP configuration is working correctly!`n`nTimestamp: $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')"
+        IsHtml = $false
+        Notes = "Use your regular Outlook.com password. For work/school accounts, may need OAuth2."
+    }
+    "Office 365" = @{
+        Server = "smtp.office365.com"
+        Port = 587
+        EnableSSL = $true
+        AuthMethod = "Basic (LOGIN)"
+        Subject = "Test Email from Office 365"
+        Body = "This is a test email sent via Office 365 SMTP using PowerShell SMTP Tester.`n`nIf you receive this message, your Office 365 SMTP configuration is working correctly!`n`nTimestamp: $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')"
+        IsHtml = $false
+        Notes = "Use your Office 365 credentials. Some organizations may require OAuth2 or app passwords."
+    }
+    "ProtonMail Bridge" = @{
+        Server = "127.0.0.1"
+        Port = 1025
+        EnableSSL = $true
+        AuthMethod = "Basic (LOGIN)"
+        Subject = "Test Email from ProtonMail"
+        Body = "This is a test email sent via ProtonMail Bridge using PowerShell SMTP Tester.`n`nIf you receive this message, your ProtonMail Bridge configuration is working correctly!`n`nTimestamp: $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')"
+        IsHtml = $false
+        Notes = "Requires ProtonMail Bridge installed and running. Use Bridge-generated password."
+    }
+    "Yahoo Mail" = @{
+        Server = "smtp.mail.yahoo.com"
+        Port = 587
+        EnableSSL = $true
+        AuthMethod = "Basic (LOGIN)"
+        Subject = "Test Email from Yahoo Mail"
+        Body = "This is a test email sent via Yahoo Mail SMTP using PowerShell SMTP Tester.`n`nIf you receive this message, your Yahoo Mail SMTP configuration is working correctly!`n`nNote: You need to generate an App Password.`n`nTimestamp: $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')"
+        IsHtml = $false
+        Notes = "Requires App Password. Generate at: login.yahoo.com/account/security"
+    }
+    "SendGrid" = @{
+        Server = "smtp.sendgrid.net"
+        Port = 587
+        EnableSSL = $true
+        AuthMethod = "Basic (LOGIN)"
+        Subject = "Test Email from SendGrid"
+        Body = "This is a test email sent via SendGrid SMTP using PowerShell SMTP Tester.`n`nIf you receive this message, your SendGrid SMTP configuration is working correctly!`n`nTimestamp: $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')"
+        IsHtml = $false
+        Notes = "Username: 'apikey' (literal), Password: Your SendGrid API Key"
+    }
+    "Mailgun" = @{
+        Server = "smtp.mailgun.org"
+        Port = 587
+        EnableSSL = $true
+        AuthMethod = "Basic (LOGIN)"
+        Subject = "Test Email from Mailgun"
+        Body = "This is a test email sent via Mailgun SMTP using PowerShell SMTP Tester.`n`nIf you receive this message, your Mailgun SMTP configuration is working correctly!`n`nTimestamp: $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')"
+        IsHtml = $false
+        Notes = "Use SMTP credentials from Mailgun dashboard (not API key)"
+    }
+    "Amazon SES" = @{
+        Server = "email-smtp.us-east-1.amazonaws.com"
+        Port = 587
+        EnableSSL = $true
+        AuthMethod = "Basic (LOGIN)"
+        Subject = "Test Email from Amazon SES"
+        Body = "This is a test email sent via Amazon SES SMTP using PowerShell SMTP Tester.`n`nIf you receive this message, your Amazon SES SMTP configuration is working correctly!`n`nTimestamp: $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')"
+        IsHtml = $false
+        Notes = "Use SMTP credentials from SES console. Server varies by region."
+    }
+}
+
+# Function to load template
+function Load-SMTPTemplate {
+    param(
+        [string]$TemplateName
+    )
+    
+    if ($script:smtpTemplates.ContainsKey($TemplateName)) {
+        $template = $script:smtpTemplates[$TemplateName]
+        
+        # Update form controls
+        $txtServer.Text = $template.Server
+        $txtPort.Text = $template.Port.ToString()
+        $chkSSL.Checked = $template.EnableSSL
+        
+        # Set auth method
+        $authIndex = $cmbAuthMethod.Items.IndexOf($template.AuthMethod)
+        if ($authIndex -ge 0) {
+            $cmbAuthMethod.SelectedIndex = $authIndex
+        }
+        
+        $txtSubject.Text = $template.Subject
+        $txtBody.Text = $template.Body
+        
+        if ($template.IsHtml) {
+            $rdoHTML.Checked = $true
+        } else {
+            $rdoPlainText.Checked = $true
+        }
+        
+        # Show template notes
+        [System.Windows.Forms.MessageBox]::Show(
+            "Template loaded: $TemplateName`n`n" +
+            "Notes:`n$($template.Notes)`n`n" +
+            "Please fill in your email address and credentials.",
+            "Template Loaded",
+            [System.Windows.Forms.MessageBoxButtons]::OK,
+            [System.Windows.Forms.MessageBoxIcon]::Information
+        )
+        
+        # Focus on From field for user to enter their email
+        $txtFrom.Focus()
+    }
+}
+
 # Create main form
 $form = New-Object System.Windows.Forms.Form
 $form.Text = "SMTP Connection Tester v1.0"
@@ -317,6 +445,22 @@ $exitItem.ShortcutKeys = [System.Windows.Forms.Keys]::Alt, [System.Windows.Forms
 
 $fileMenu.DropDownItems.AddRange(@($saveConfigItem, $loadConfigItem, (New-Object System.Windows.Forms.ToolStripSeparator), $exitItem))
 
+# Templates Menu
+$templatesMenu = New-Object System.Windows.Forms.ToolStripMenuItem
+$templatesMenu.Text = "&Templates"
+
+# Create menu items for each template
+foreach ($templateName in $script:smtpTemplates.Keys | Sort-Object) {
+    $templateItem = New-Object System.Windows.Forms.ToolStripMenuItem
+    $templateItem.Text = $templateName
+    $templateItem.Tag = $templateName
+    $templateItem.Add_Click({
+        param($sender, $e)
+        Load-SMTPTemplate -TemplateName $sender.Tag
+    })
+    $templatesMenu.DropDownItems.Add($templateItem)
+}
+
 $helpMenu = New-Object System.Windows.Forms.ToolStripMenuItem
 $helpMenu.Text = "&Help"
 
@@ -329,7 +473,7 @@ $aboutItem.Text = "&About"
 
 $helpMenu.DropDownItems.AddRange(@($helpItem, $aboutItem))
 
-$menuStrip.Items.AddRange(@($fileMenu, $helpMenu))
+$menuStrip.Items.AddRange(@($fileMenu, $templatesMenu, $helpMenu))
 $form.Controls.Add($menuStrip)
 
 $yPos = 35
