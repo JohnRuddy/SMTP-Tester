@@ -331,50 +331,6 @@ $script:smtpTemplates = @{
     }
 }
 
-# Function to load template
-function Load-SMTPTemplate {
-    param(
-        [string]$TemplateName
-    )
-    
-    if ($script:smtpTemplates.ContainsKey($TemplateName)) {
-        $template = $script:smtpTemplates[$TemplateName]
-        
-        # Update form controls
-        $txtServer.Text = $template.Server
-        $txtPort.Text = $template.Port.ToString()
-        $chkSSL.Checked = $template.EnableSSL
-        
-        # Set auth method
-        $authIndex = $cmbAuthMethod.Items.IndexOf($template.AuthMethod)
-        if ($authIndex -ge 0) {
-            $cmbAuthMethod.SelectedIndex = $authIndex
-        }
-        
-        $txtSubject.Text = $template.Subject
-        $txtBody.Text = $template.Body
-        
-        if ($template.IsHtml) {
-            $rdoHTML.Checked = $true
-        } else {
-            $rdoPlainText.Checked = $true
-        }
-        
-        # Show template notes
-        [System.Windows.Forms.MessageBox]::Show(
-            "Template loaded: $TemplateName`n`n" +
-            "Notes:`n$($template.Notes)`n`n" +
-            "Please fill in your email address and credentials.",
-            "Template Loaded",
-            [System.Windows.Forms.MessageBoxButtons]::OK,
-            [System.Windows.Forms.MessageBoxIcon]::Information
-        )
-        
-        # Focus on From field for user to enter their email
-        $txtFrom.Focus()
-    }
-}
-
 # Create main form
 $form = New-Object System.Windows.Forms.Form
 $form.Text = "SMTP Connection Tester v1.0"
@@ -455,8 +411,45 @@ foreach ($templateName in $script:smtpTemplates.Keys | Sort-Object) {
     $templateItem.Text = $templateName
     $templateItem.Tag = $templateName
     $templateItem.Add_Click({
-        param($sender, $e)
-        Load-SMTPTemplate -TemplateName $sender.Tag
+        param($menuSender, $menuArgs)
+        $selectedTemplate = $menuSender.Tag
+        
+        if ($script:smtpTemplates.ContainsKey($selectedTemplate)) {
+            $template = $script:smtpTemplates[$selectedTemplate]
+            
+            # Update form controls
+            $txtServer.Text = $template.Server
+            $txtPort.Text = $template.Port.ToString()
+            $chkSSL.Checked = $template.EnableSSL
+            
+            # Set auth method
+            $authIndex = $cmbAuthMethod.Items.IndexOf($template.AuthMethod)
+            if ($authIndex -ge 0) {
+                $cmbAuthMethod.SelectedIndex = $authIndex
+            }
+            
+            $txtSubject.Text = $template.Subject
+            $txtBody.Text = $template.Body
+            
+            if ($template.IsHtml) {
+                $rdoHTML.Checked = $true
+            } else {
+                $rdoPlainText.Checked = $true
+            }
+            
+            # Show template notes
+            [System.Windows.Forms.MessageBox]::Show(
+                "Template loaded: $selectedTemplate`n`n" +
+                "Notes:`n$($template.Notes)`n`n" +
+                "Please fill in your email address and credentials.",
+                "Template Loaded",
+                [System.Windows.Forms.MessageBoxButtons]::OK,
+                [System.Windows.Forms.MessageBoxIcon]::Information
+            )
+            
+            # Focus on From field for user to enter their email
+            $txtFrom.Focus()
+        }
     })
     $templatesMenu.DropDownItems.Add($templateItem)
 }

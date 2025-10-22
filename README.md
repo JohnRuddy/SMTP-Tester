@@ -4,6 +4,7 @@ A comprehensive PowerShell-based SMTP connection testing tool with a user-friend
 
 ## Features
 
+- **Pre-configured Templates**: Quick setup for Gmail, Outlook.com, Office 365, ProtonMail, Yahoo Mail, SendGrid, Mailgun, and Amazon SES
 - **Multiple Authentication Methods**: Basic (LOGIN), OAuth2, NTLM, PLAIN, CRAM-MD5, DIGEST-MD5, and Anonymous
 - **SSL/TLS Support**: Secure connections with configurable encryption
 - **Email Formats**: Support for both HTML and plain text emails
@@ -40,6 +41,33 @@ Or right-click the file and select "Run with PowerShell"
 - **Ctrl+O** - Load Configuration
 - **F1** - Show Help
 - **Tab** - Navigate between fields
+
+## Using Service Templates
+
+The application includes pre-configured templates for popular email services. Access them via the **Templates** menu:
+
+### Available Templates
+
+1. **Gmail** - Google's email service
+2. **Outlook.com / Hotmail** - Microsoft consumer email
+3. **Office 365** - Microsoft business email
+4. **ProtonMail Bridge** - Secure email (requires Bridge app)
+5. **Yahoo Mail** - Yahoo's email service
+6. **SendGrid** - Email delivery service
+7. **Mailgun** - Email API service
+8. **Amazon SES** - AWS email service
+
+### How to Use Templates
+
+1. Click **Templates** in the menu bar
+2. Select your email service
+3. Read the template notes (important setup information)
+4. Fill in your email address in the "From" field
+5. Fill in your credentials (username/password)
+6. Add a recipient in the "To" field
+7. Click **Test Connection**
+
+**Note:** Each template includes specific notes about authentication requirements (e.g., app passwords, API keys).
 
 ### Common SMTP Ports
 
