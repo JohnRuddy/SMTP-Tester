@@ -70,12 +70,12 @@ function Test-FFmpeg {
     try {
         $null = & ffmpeg -version 2>&1
         if ($LASTEXITCODE -eq 0) {
-            Write-Host "✓ FFmpeg found" -ForegroundColor Green
+            Write-Host "[OK] FFmpeg found" -ForegroundColor Green
             return $true
         }
     }
     catch {
-        Write-Host "✗ FFmpeg not found in system PATH" -ForegroundColor Red
+        Write-Host "[ERROR] FFmpeg not found in system PATH" -ForegroundColor Red
         Write-Host "`nPlease install FFmpeg:" -ForegroundColor Yellow
         Write-Host "  1. Download from: https://ffmpeg.org/download.html" -ForegroundColor Cyan
         Write-Host "  2. Extract the files" -ForegroundColor Cyan
@@ -154,18 +154,18 @@ function Convert-WavFile {
         if ($process.ExitCode -eq 0) {
             $outputInfo = Get-Item $OutputFile
             $sizeKB = [math]::Round($outputInfo.Length / 1KB, 2)
-            Write-Host "✓ Success! Size: $sizeKB KB" -ForegroundColor Green
+            Write-Host "[SUCCESS] Converted! Size: $sizeKB KB" -ForegroundColor Green
             return $true
         }
         else {
-            Write-Host "✗ Conversion failed!" -ForegroundColor Red
+            Write-Host "[FAILED] Conversion failed!" -ForegroundColor Red
             $errorLog = Get-Content "$env:TEMP\ffmpeg_error.log" -Raw
             Write-Host "Error details: $errorLog" -ForegroundColor Red
             return $false
         }
     }
     catch {
-        Write-Host "✗ Error: $($_.Exception.Message)" -ForegroundColor Red
+        Write-Host "[ERROR] $($_.Exception.Message)" -ForegroundColor Red
         return $false
     }
 }
@@ -184,7 +184,7 @@ if (-not (Test-FFmpeg)) {
 # Resolve input path
 $InputPath = Resolve-Path $InputPath -ErrorAction SilentlyContinue
 if (-not $InputPath) {
-    Write-Host "✗ Input path not found!" -ForegroundColor Red
+    Write-Host "[ERROR] Input path not found!" -ForegroundColor Red
     exit 1
 }
 
@@ -193,7 +193,7 @@ $wavFiles = @()
 if (Test-Path $InputPath -PathType Leaf) {
     # Single file
     if ($InputPath -notmatch '\.wav$') {
-        Write-Host "✗ Input file is not a WAV file!" -ForegroundColor Red
+        Write-Host "[ERROR] Input file is not a WAV file!" -ForegroundColor Red
         exit 1
     }
     $wavFiles = @(Get-Item $InputPath)
@@ -209,7 +209,7 @@ else {
 }
 
 if ($wavFiles.Count -eq 0) {
-    Write-Host "✗ No WAV files found!" -ForegroundColor Yellow
+    Write-Host "[WARNING] No WAV files found!" -ForegroundColor Yellow
     exit 0
 }
 
